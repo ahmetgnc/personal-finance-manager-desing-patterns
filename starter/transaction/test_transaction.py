@@ -2,6 +2,7 @@ import unittest
 from transaction.transaction import Transaction
 from transaction.transaction_category import TransactionCategory
 
+
 class TestTransaction(unittest.TestCase):
 
     def test_transaction_creation(self):
@@ -11,7 +12,9 @@ class TestTransaction(unittest.TestCase):
 
     def test_transaction_str(self):
         t = Transaction(50, TransactionCategory.INCOME)
-        self.assertEqual(str(t), "Transaction($50, category='TransactionCategory.INCOME')")
+        self.assertEqual(
+            str(t), "Transaction($50, category='TransactionCategory.INCOME')"
+        )
 
     def test_transaction_equality(self):
         t1 = Transaction(20, TransactionCategory.EXPENSE)
@@ -19,6 +22,18 @@ class TestTransaction(unittest.TestCase):
         t3 = Transaction(30, TransactionCategory.EXPENSE)
         self.assertEqual(t1, t2)
         self.assertNotEqual(t1, t3)
+
+    def test_transactions_with_different_categories_are_not_equal(self):
+        income = Transaction(20, TransactionCategory.INCOME)
+        expense = Transaction(20, TransactionCategory.EXPENSE)
+        self.assertNotEqual(income, expense)
+
+    def test_transaction_is_not_equal_to_other_types(self):
+        transaction = Transaction(20, TransactionCategory.INCOME)
+        for other in (None, 20, "20", object()):
+            with self.subTest(other=other):
+                self.assertNotEqual(transaction, other)
+
 
 if __name__ == "__main__":
     unittest.main()
