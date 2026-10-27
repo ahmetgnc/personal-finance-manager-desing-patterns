@@ -59,6 +59,28 @@ class TestBalanceObservers(unittest.TestCase):
         self.balance.add_income(100)
         self.observer.update.assert_not_called()
 
+    def test_observer_can_unregister_itself_during_notification(self):
+        def unregister(balance, transaction):
+            self.balance.unregister_observer(self.observer)
+
+        other_observer = Mock(spec=IBalanceObserver)
+        self.balance.register_observer(other_observer)
+        self.observer.update.side_effect = unregister
+
+        self.balance.add_income(100)
+        self.balance.add_expense(40)
+
+        self.observer.update.assert_called_once_with(
+            100, Transaction(100, TransactionCategory.INCOME)
+        )
+        self.assertEqual(other_observer.update.call_count, 2)
+        other_observer.update.assert_any_call(
+            100, Transaction(100, TransactionCategory.INCOME)
+        )
+        other_observer.update.assert_called_with(
+            60, Transaction(40, TransactionCategory.EXPENSE)
+        )
+
     @patch("builtins.print")
     def test_print_observer_displays_transaction_and_balance(self, print_mock):
         transaction = Transaction(100, TransactionCategory.INCOME)

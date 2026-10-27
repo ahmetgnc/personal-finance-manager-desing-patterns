@@ -29,13 +29,19 @@ python main.py
 
 This project uses Python’s built-in unittest framework.
 
-To run all tests:
+To run all tests from the `starter` directory:
 
 ```
 python -m unittest discover
 ```
 
-To run a single test file:
+From the repository root, use:
+
+```
+python -m unittest discover -s starter
+```
+
+To run a single test file from the `starter` directory:
 ```
 python -m unittest balance/test_balance_observer.py
 ```
@@ -46,6 +52,7 @@ python -m unittest balance/test_balance_observer.py
 - test_transaction.py → Confirms transactions update balances correctly.
 - test_transaction_adapter.py → Ensures external income data is correctly adapted into Transaction objects.
 - test_balance_observer.py → Validates that low-balance alerts are triggered at the correct threshold.
+- test_main.py → Checks the complete transaction flow and repeated application runs.
 
 ## Project Instructions
 
