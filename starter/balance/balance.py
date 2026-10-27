@@ -1,3 +1,4 @@
+from balance.balance_strategy import ExpenseStrategy, IncomeStrategy
 from transaction.transaction import Transaction
 from transaction.transaction_category import TransactionCategory
 
@@ -18,6 +19,10 @@ class Balance:
             cls._instance = object.__new__(cls)
             cls._instance._balance = 0.0
             cls._instance._observers = []
+            cls._instance._strategies = {
+                TransactionCategory.INCOME: IncomeStrategy(),
+                TransactionCategory.EXPENSE: ExpenseStrategy(),
+            }
         return cls._instance
 
     def reset(self):
@@ -52,12 +57,10 @@ class Balance:
         Args:
             transaction (Transaction): The transaction to apply.
         """
-        if transaction.category == TransactionCategory.INCOME:
-            self._balance += transaction.amount
-        elif transaction.category == TransactionCategory.EXPENSE:
-            self._balance -= transaction.amount
-        else:
+        strategy = self._strategies.get(transaction.category)
+        if strategy is None:
             raise ValueError("Unsupported transaction category.")
+        self._balance = strategy.calculate(self._balance, transaction.amount)
         self._notify_observers(transaction)
 
     def get_balance(self):

@@ -55,6 +55,18 @@ class TestBalance(unittest.TestCase):
             self.balance.apply_transaction(t)
         self.assertEqual(self.balance.get_balance(), 50)
 
+    def test_mixed_transactions_select_the_correct_strategy(self):
+        transactions = [
+            (12.5, TransactionCategory.EXPENSE, -12.5),
+            (100, TransactionCategory.INCOME, 87.5),
+            (87.5, TransactionCategory.EXPENSE, 0),
+            (0, TransactionCategory.INCOME, 0),
+        ]
+        for amount, category, expected_balance in transactions:
+            with self.subTest(amount=amount, category=category):
+                self.balance.apply_transaction(Transaction(amount, category))
+                self.assertEqual(self.balance.get_balance(), expected_balance)
+
     def test_reset(self):
         self.balance.add_income(100)
         self.balance.add_expense(50)
