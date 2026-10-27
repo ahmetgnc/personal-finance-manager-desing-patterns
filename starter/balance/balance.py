@@ -1,6 +1,5 @@
-# balance.py
-
 from transaction.transaction_category import TransactionCategory
+
 
 class Balance:
     """Singleton to track the balance."""
@@ -9,19 +8,27 @@ class Balance:
 
     def __init__(self):
         """Initialize the balance. Prevent direct instantiation."""
-        pass
+        raise RuntimeError("Use Balance.get_instance() to access the balance.")
+
+    @classmethod
+    def get_instance(cls):
+        """Return the shared balance instance."""
+        if cls._instance is None:
+            cls._instance = object.__new__(cls)
+            cls._instance._balance = 0.0
+        return cls._instance
 
     def reset(self):
         """Reset the net balance to zero."""
-        pass
+        self._balance = 0.0
 
     def add_income(self, amount):
         """Add income to the balance."""
-        pass
+        self._balance += amount
 
     def add_expense(self, amount):
         """Subtract expense from the balance."""
-        pass
+        self._balance -= amount
 
     def apply_transaction(self, transaction):
         """
@@ -30,13 +37,17 @@ class Balance:
         Args:
             transaction (Transaction): The transaction to apply.
         """
-        pass
+        if transaction.category == TransactionCategory.INCOME:
+            self.add_income(transaction.amount)
+        elif transaction.category == TransactionCategory.EXPENSE:
+            self.add_expense(transaction.amount)
+        else:
+            raise ValueError("Unsupported transaction category.")
 
     def get_balance(self):
         """Get the current net balance."""
-        pass
+        return self._balance
 
     def summary(self):
         """Return a summary string of the net balance."""
-        pass
-    
+        return f"Net balance: ${self._balance:.2f}"
